@@ -1,0 +1,11 @@
+Sefik Mehmedovic
+CS 4760 OS
+Program 6 -- Memory Management --
+
+------------------------------------------------------------------------
+1. compile by running 'make'
+2. to run program './oss' which will run default values
+3. to see help options './oss -h' 
+4. to remove all executables and logs 'make clean'
+------------------------------------------------------------------------
+
