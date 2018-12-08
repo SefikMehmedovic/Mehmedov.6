@@ -11,6 +11,8 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/ipc.h>
+
 
 //shared memory key
 #define SHMKEY 321800
@@ -21,6 +23,21 @@ typedef struct {
     unsigned int nanoSeconds;
 } clockTime;
 
+//shared memory struct
+typedef struct {
+    int sharedPID[18];       
+    int checkProcNum[18];
+    int processAddCalled[18];
+    int processRW[18];
+    int processCallCount[18];
+} shared_t;
+
+
+int sharedShmid;
+shared_t *sharedShmptr; 
+key_t key; 
+int msgid; 
+int PIDHolder[18] = {}; 
 
 //function prototypes
 void ctrlCHandler(int signal);
@@ -38,14 +55,14 @@ int main(int argc, char* argv[]) {
     if(sharedShmid < 0)
     {
         perror("Shmget error in oss \n");
-        exit(errno);
+        exit(0);
     }
     sharedShmptr = shmat(sharedShmid, NULL, 0);
     if(sharedShmptr < 0){
         perror("Shmat error in oss\n");
-        exit(errno);
+        exit(0);
     }
-}
+
  //-------
  messageQueue();
  

@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <signal.h>
 #include <stdio.h>
+#include <sys/ipc.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/shm.h>
@@ -15,16 +16,32 @@
 //shared memory key
 #define SHMKEY 321800
 
+
 //time struct 
 typedef struct {
     unsigned int seconds;
     unsigned int nanoSeconds;
 } clockTime;
 
+//shared memory struct
+typedef struct {
+    int sharedPID[18];       
+    int checkProcNum[18];
+    int processAddCalled[18];
+    int processRW[18];
+    int processCallCount[18];
+} shared_t;
+
+int sharedShmid;
+clockTime *sharedShmptr; 
+key_t key; 
+int msgid; 
+int PIDHolder[18] = {}; 
 
 //function prototypes
 void ctrlCHandler(int signal);
 void cleanup();
+void forkProcess();
 void messageQueue();
 
 int main(int argc, char* argv[]) {
@@ -74,18 +91,18 @@ int main(int argc, char* argv[]) {
     if(sharedShmid < 0)
     {
         perror("Shmget error in oss \n");
-        exit(errno);
+        exit(0);
     }
     sharedShmptr = shmat(sharedShmid, NULL, 0);
     if(sharedShmptr < 0){
         perror("Shmat error in oss\n");
-        exit(errno);
+        exit(0);
     }
-}
+
 ///-----
 
 messageQueue();
- 
+forkProcess(); 
  
  
  
@@ -102,7 +119,27 @@ messageQueue();
         msgid = msgget(key, 0666 | IPC_CREAT);
 }
  
+void forkProcess(){
  
+    int i;
+    for(i = 0; i < 18; i++){
+        if(PIDHolder[i] == 0){
+            int positionPID = i;
+            char stashbox[10];
+            sprintf(stashbox, "%d", positionPID);
+             
+            if ((PIDHolder[i] = fork()) == 0) {
+                
+                execl("./user", "user", stashbox, NULL);
+            }
+
+            printf("\nfork  with PID: %d and i: %d\n", PIDHolder[i], i);
+
+            break;
+        }
+
+    }
+} 
  
  
  //Ctrl+C handler
