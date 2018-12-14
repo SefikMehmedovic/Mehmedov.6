@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
         exit(0);
     }
 
- //-------
+ //-----message queue
  messageQueue();
  
  return 0;// main return

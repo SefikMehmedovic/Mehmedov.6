@@ -115,10 +115,9 @@ forkProcess();
         //generate unique key
         key = ftok("oss", 10);
         //message queue
-       
         msgid = msgget(key, 0666 | IPC_CREAT);
 }
- 
+//--------fork children process
 void forkProcess(){
  
     int i;
